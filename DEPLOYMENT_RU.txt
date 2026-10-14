@@ -1,0 +1,27 @@
+КАК ОПУБЛИКОВАТЬ СТРАНИЦЫ И ДОБАВИТЬ ССЫЛКИ В DISCORD
+
+1. Войди в GitHub: https://github.com/new
+2. Создай публичный репозиторий с названием moai-studio-21 (или используй другое имя, но тогда поменяй его в адресах ниже).
+3. Нажми Create repository.
+4. Выбери Add file -> Upload files.
+5. Загрузи index.html, terms.html и privacy.html в корневую папку. README-файлы можно тоже загрузить: GitHub покажет README.md на главной репозитория.
+6. Нажми Commit changes.
+7. Открой Settings -> Pages.
+8. В Build and deployment выбери Deploy from a branch; Branch: main; Folder: /(root), затем Save.
+9. Подожди публикации. Проверь, что все страницы открываются публично без входа в GitHub.
+
+Если имя репозитория moai-studio-21, ссылки будут иметь вид:
+https://ТВОЙ-ЛОГИН.github.io/moai-studio-21/
+https://ТВОЙ-ЛОГИН.github.io/moai-studio-21/terms.html
+https://ТВОЙ-ЛОГИН.github.io/moai-studio-21/privacy.html
+
+В Discord Developer Portal -> твоё приложение -> General Information вставь:
+Terms of Service URL: https://ТВОЙ-ЛОГИН.github.io/moai-studio-21/terms.html
+Privacy Policy URL: https://ТВОЙ-ЛОГИН.github.io/moai-studio-21/privacy.html
+
+ВАЖНО:
+- Замени ТВОЙ-ЛОГИН на логин GitHub.
+- Не указывай ссылки в Discord, пока страницы действительно не опубликованы и не открываются без авторизации.
+- Тексты рассчитаны на проект без собственного backend/сервера и без самостоятельного сбора или хранения персональных данных.
+- Если RPC-клиент собирает телеметрию, данные аккаунта или отправляет информацию на твой сервер, политику конфиденциальности нужно изменить под реальные процессы.
+- Это шаблоны, а не юридическая консультация.
