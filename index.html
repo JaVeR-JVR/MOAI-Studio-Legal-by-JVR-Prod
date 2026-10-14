@@ -1,351 +1,179 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#090909">
-  <meta name="description" content="MOAI Studio 21 — a fictional stone-age audio workstation from JVR_Prod. Serious about the bit. Not serious about the DAW.">
-  <title>MOAI Studio 21 — Stone Sound System</title>
-  <style>
-    :root {
-      color-scheme: dark;
-      --black:#090909; --near:#111111; --panel:#151515; --paper:#f4f1eb;
-      --white:#f5f4f1; --muted:#a6a39d; --dim:#73716d; --line:#373431;
-      --red:#c52335; --red2:#8b1523; --sakura:#e7a2b0; --sakura-soft:#d88c9d;
-      --max:1220px; --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
-      --sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      --serif:Georgia,"Times New Roman",serif;
-    }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth;scroll-padding-top:84px}
-    body{margin:0;background:var(--black);color:var(--white);font-family:var(--sans);font-size:15px;line-height:1.55;letter-spacing:-.018em;overflow-x:hidden}
-    body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:30;opacity:.055;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.84' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E")}
-    a{color:inherit;text-decoration:none}a:hover{color:var(--sakura)}
-    button{font:inherit}button:focus-visible,a:focus-visible{outline:2px solid var(--sakura);outline-offset:4px}
-    .skip{position:absolute;left:-999px;top:8px;background:var(--paper);color:#111;padding:10px 14px;z-index:100}.skip:focus{left:12px}
-    .wrap{width:min(calc(100% - 48px),var(--max));margin-inline:auto}
-    .mono,.eyebrow,.micro,.nav,.tag,.readout,.section-no,.image-caption,.changelog time,.status-code{font-family:var(--mono);letter-spacing:.045em}
-    .eyebrow{display:flex;align-items:center;gap:10px;color:var(--sakura);font-size:10px;line-height:1.4;text-transform:uppercase}
-    .eyebrow:before{content:"";height:1px;width:24px;background:var(--red);display:inline-block;flex:0 0 auto}
-    .muted{color:var(--muted)}
-    .topbar{position:sticky;top:0;z-index:40;background:rgba(9,9,9,.9);backdrop-filter:blur(18px);border-bottom:1px solid #282523}
-    .topbar-inner{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px}
-    .brand{display:flex;align-items:center;gap:11px;min-width:max-content}
-    .brand-image{width:38px;height:38px;display:block;object-fit:cover;border:1px solid #726c68;background:#fff}
-    .brand-copy{display:flex;flex-direction:column;gap:1px}.brand-title{font-size:13px;font-weight:820;letter-spacing:-.035em}.brand-sub{font:9px var(--mono);color:var(--muted);letter-spacing:.08em}
-    .nav{display:flex;align-items:center;gap:25px;color:#c3c0bb;font-size:10px;text-transform:uppercase}.nav a{transition:color .15s}.nav a:hover{color:var(--sakura)}
-    .top-actions{display:flex;align-items:center;gap:9px}
-    .lang-btn,.line-btn,.red-btn{display:inline-flex;justify-content:center;align-items:center;gap:8px;min-height:38px;padding:9px 13px;border:1px solid #504944;background:transparent;color:var(--white);font:10px var(--mono);letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:background .2s,color .2s,border-color .2s,transform .2s}
-    .lang-btn{min-width:76px;border-color:#5b504f}.lang-btn:hover,.line-btn:hover{border-color:var(--sakura);color:var(--sakura)}
-    .red-btn{background:var(--red);border-color:var(--red);color:#fff}.red-btn:hover{background:#e02a40;border-color:#e02a40;transform:translateY(-1px);color:#fff}
-    .hero{position:relative;padding:65px 0 52px;isolation:isolate}
-    .hero-top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:22px}
-    .hero-code{font:10px var(--mono);letter-spacing:.06em;color:#908b86;text-align:right}
-    .hero-cover{position:relative;min-height:clamp(470px,58vw,680px);display:grid;grid-template-columns:1fr;isolation:isolate;border:1px solid #4b4542;overflow:hidden;background:#191817}
-    .cover-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:-3}
-    .hero-cover:after{content:"";position:absolute;inset:0;z-index:-2;background:linear-gradient(90deg,rgba(8,8,8,.94) 0%,rgba(8,8,8,.76) 34%,rgba(8,8,8,.18) 74%,rgba(8,8,8,.4) 100%),linear-gradient(0deg,rgba(8,8,8,.84) 0%,transparent 55%)}
-    .cover-grid{position:absolute;inset:0;z-index:-1;opacity:.23;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.15) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.15) 1px,transparent 1px);background-size:54px 54px;mask-image:linear-gradient(90deg,#000,transparent 88%)}
-    .cover-content{align-self:end;max-width:750px;padding:clamp(25px,5vw,68px);padding-bottom:clamp(36px,6vw,74px)}
-    .cover-content h1{font-size:clamp(53px,10.1vw,132px);line-height:.82;letter-spacing:-.09em;margin:23px 0 25px;font-weight:900;max-width:850px}
-    .cover-content h1 span{display:block;color:var(--sakura);font-family:var(--serif);font-weight:400;font-style:italic;letter-spacing:-.075em}
-    .cover-copy{max-width:490px;color:#dfdcd7;font-size:clamp(15px,1.65vw,18px);line-height:1.6;margin:0}
-    .cover-quote{margin-top:26px;border-left:2px solid var(--red);padding:1px 0 1px 15px;font-size:13px;color:#fff;max-width:490px}
-    .cover-quote small{display:block;margin-top:9px;font:9px var(--mono);text-transform:uppercase;color:#beb6b1;letter-spacing:.08em}
-    .cover-meta{position:absolute;right:22px;bottom:21px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:flex-end;color:#f3f0eb;font:9px var(--mono);letter-spacing:.08em;text-transform:uppercase}
-    .meta-chip{padding:7px 9px;border:1px solid rgba(255,255,255,.38);background:rgba(0,0,0,.36);backdrop-filter:blur(8px)}.meta-chip.red{background:var(--red);border-color:var(--red)}
-    .torii-watermark{position:absolute;right:8%;top:6%;width:min(29vw,320px);opacity:.9;pointer-events:none;filter:drop-shadow(0 4px 22px rgba(0,0,0,.35))}
-    .sakura-petal{position:absolute;width:13px;height:19px;background:var(--sakura);border-radius:100% 0 100% 0;opacity:.66;pointer-events:none;z-index:2;box-shadow:0 0 18px rgba(197,35,53,.2)}
-    .petal-a{top:20%;right:9%;transform:translate3d(0,var(--parallax-y,0px),0) rotate(30deg)}.petal-b{top:42%;right:4%;width:8px;height:12px;transform:translate3d(0,var(--parallax-y,0px),0) rotate(73deg)}.petal-c{top:12%;left:42%;width:10px;height:15px;transform:translate3d(0,var(--parallax-y,0px),0) rotate(-26deg)}
-    .floating-cube{position:absolute;width:clamp(82px,10vw,136px);aspect-ratio:1;right:4.3%;bottom:13%;border:6px solid #080808;box-shadow:0 14px 46px #0008;transform:translate3d(0,var(--parallax-y,0px),0) rotate(5deg);z-index:4;background:#0a0a0a}
-    .floating-cube img{display:block;width:100%;height:100%;object-fit:cover}
-    .photo-label{position:absolute;left:9px;bottom:8px;background:#080808;color:#fff;padding:4px 6px;font:8px var(--mono);letter-spacing:.03em}
-    .hero-footer{display:flex;justify-content:space-between;gap:18px;align-items:center;padding-top:15px;color:#928d87;font:9px var(--mono);letter-spacing:.06em;text-transform:uppercase}
-    .hero-footer .red-mark{color:var(--sakura)}
-    .ticker{border-block:1px solid #37302d;background:#100e0e;overflow:hidden;white-space:nowrap}
-    .ticker-inner{display:flex;align-items:center;justify-content:space-around;gap:30px;min-height:48px;font:10px var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#d7d2cc}
-    .ticker b{color:var(--red);font-weight:400}.ticker .flower{color:var(--sakura);font-size:16px}
-    .section{position:relative;padding:clamp(70px,9vw,116px) 0;border-bottom:1px solid #2d2927;isolation:isolate}
-    .section-head{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:38px}
-    .section-title{font-size:clamp(34px,5.6vw,70px);font-weight:850;line-height:.93;letter-spacing:-.075em;margin:14px 0 0;max-width:720px}
-    .section-title em{font-family:var(--serif);font-weight:400;letter-spacing:-.055em;color:var(--sakura)}
-    .section-intro{max-width:365px;color:#b9b5af;font-size:14px;line-height:1.7;margin:0}
-    .section-no{font-size:10px;color:#7d7772;white-space:nowrap}
-    .studio-grid{display:grid;grid-template-columns:minmax(260px,.73fr) minmax(0,1.27fr);gap:34px;align-items:start}
-    .studio-note{position:sticky;top:106px}
-    .studio-note h3{font-size:clamp(24px,3.5vw,42px);letter-spacing:-.06em;line-height:1.05;margin:18px 0 16px}.studio-note p{max-width:390px;color:#b7b2ad}.studio-note .rule{height:1px;background:var(--line);margin:23px 0}.readout{font-size:10px;color:#c3bdb6;line-height:1.85;text-transform:uppercase}.readout strong{color:var(--sakura);font-weight:400}
-    .daw-frame{border:1px solid #55504b;background:#101010;box-shadow:0 28px 70px rgba(0,0,0,.32)}
-    .daw-titlebar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;border-bottom:1px solid #393330;background:#1a1918}
-    .daw-brand{display:flex;align-items:center;gap:10px;font:11px var(--mono);text-transform:uppercase;letter-spacing:.04em}
-    .daw-sigil{width:24px;height:24px;background:var(--red);display:grid;place-items:center;color:#fff;font-size:10px;font-weight:bold}
-    .daw-version{font:9px var(--mono);color:#a09a94}
-    .daw-toolbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:11px 13px;border-bottom:1px solid #34302d}
-    .daw-control{border:1px solid #514943;background:#171615;color:#ece8e2;padding:7px 9px;font:9px var(--mono);text-transform:uppercase;cursor:pointer}.daw-control:hover,.daw-control[aria-pressed="true"]{border-color:var(--sakura);color:var(--sakura)}
-    .daw-clock{margin-left:auto;color:var(--sakura);font:9px var(--mono)}
-    .daw-screen{display:grid;grid-template-columns:133px minmax(0,1fr)}
-    .track-names{border-right:1px solid #35302d;background:#151413}.track-name{height:54px;padding:10px 11px;border-bottom:1px solid #312d2a;display:flex;flex-direction:column;justify-content:center;gap:3px;font:9px var(--mono);color:#e8e2dc}.track-name span{font-size:8px;color:#96908b}.track-name:before{content:"";position:absolute}
-    .timeline{min-width:0;overflow:hidden}.ruler{height:24px;display:grid;grid-template-columns:repeat(8,minmax(30px,1fr));border-bottom:1px solid #312d2a;background:#191817;color:#8f8882;font:8px var(--mono)}.ruler span{padding:5px 5px;border-left:1px solid #312d2a}
-    .lane{position:relative;height:54px;border-bottom:1px solid #312d2a;background-color:#111;background-image:linear-gradient(90deg,transparent calc(100% - 1px),#302b28 calc(100% - 1px));background-size:12.5% 100%}
-    .clip{position:absolute;top:9px;height:35px;left:3%;border:1px solid #d75b6a;background:rgba(197,35,53,.68);color:#fff;padding:4px 6px;display:flex;align-items:center;overflow:hidden;font:8px var(--mono);white-space:nowrap}.clip.white{background:#d8d3cb;border-color:#f5f0e7;color:#111}.clip.pink{background:#7e4652;border-color:#b77d89}.clip:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 6px,#09090930 7px 8px)}.clip span{position:relative;z-index:1}
-    .piano{padding:14px;background:#171615;border-top:1px solid #393330}.piano-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px;color:#bbb4ad;font:8px var(--mono);text-transform:uppercase}.piano-grid{height:73px;display:grid;grid-template-columns:repeat(16,1fr);grid-template-rows:repeat(4,1fr);background:repeating-linear-gradient(90deg,transparent 0 calc(6.25% - 1px),#3a3430 calc(6.25% - 1px) 6.25%),repeating-linear-gradient(0deg,#171615 0 calc(25% - 1px),#403834 calc(25% - 1px) 25%);border:1px solid #3a3430}
-    .note{height:12px;align-self:center;background:var(--paper);box-shadow:0 0 0 1px #fff4}.note.red{background:var(--red)}.note.pink{background:var(--sakura)}
-    .daw-output{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:11px 14px;border-top:1px solid #3c3531;background:#100f0e;font:9px var(--mono);color:#b9b2aa}.daw-output strong{color:var(--sakura);font-weight:400}.meter{width:100px;height:5px;background:#38302e;overflow:hidden}.meter span{display:block;width:72%;height:100%;background:var(--red);transition:width .35s}
-    .studio-cubes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-    .image-tile{position:relative;min-width:0;margin:0;overflow:hidden;border:1px solid #45403c;background:#121212}
-    .image-tile img{display:block;width:100%;height:100%;object-fit:cover;background:#fff;filter:contrast(1.02)}
-    .image-tile .tile-index{position:absolute;top:9px;left:9px;background:#090909;color:#fff;padding:5px 7px;font:8px var(--mono);letter-spacing:.06em}
-    .image-tile .image-caption{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:linear-gradient(0deg,rgba(0,0,0,.95),transparent);font-size:9px;color:#f8f5ef;text-transform:uppercase}
-    .tile-square{aspect-ratio:1}.tile-wide{aspect-ratio:16/9}.tile-portrait{aspect-ratio:4/5}.tile-hero{aspect-ratio:16/10}
-    .photo-tape{position:absolute;top:13px;right:13px;width:43px;height:12px;background:var(--sakura);transform:rotate(7deg);opacity:.8}
-    .world{overflow:hidden;background:linear-gradient(180deg,#0a0909,#100c0d 62%,#090909)}
-    .world:before{content:"";position:absolute;width:420px;height:420px;right:-190px;top:7%;border:1px solid #5b2028;border-radius:50%;box-shadow:0 0 0 40px #bd23340a,0 0 0 80px #bd233408,0 0 0 120px #bd233405;z-index:-1}
-    .quote-layout{display:grid;grid-template-columns:.78fr 1.22fr;gap:38px;align-items:start}
-    .quote-lead{max-width:400px}.quote-lead p{color:#b8b2ac;line-height:1.75}
-    .quote-list{border-top:1px solid #443536}
-    .quote-item{display:grid;grid-template-columns:92px minmax(0,1fr) auto;align-items:center;gap:20px;padding:20px 0;border-bottom:1px solid #443536}
-    .quote-stamp{font:9px var(--mono);color:var(--sakura);letter-spacing:.07em;text-transform:uppercase}.quote-text{font-size:clamp(17px,2.2vw,24px);line-height:1.25;letter-spacing:-.035em}.quote-text em{font-family:var(--serif);color:var(--sakura);font-weight:400}.quote-index{font:10px var(--mono);color:#6d6260}
-    .quote-note{margin-top:18px;color:#8f8883;font:9px var(--mono);text-transform:uppercase;letter-spacing:.06em}
-    .world-bottom{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:42px}
-    .world-bottom .image-tile:nth-child(2){transform:translateY(24px)}
-    .code-section{background:#0b0b0b}
-    .protocol-grid{display:grid;grid-template-columns:1fr .75fr;gap:56px;align-items:center}
-    .protocol-list{border-top:1px solid #3b3632}.protocol-row{display:grid;grid-template-columns:43px 1fr;gap:17px;padding:19px 0;border-bottom:1px solid #3b3632}.protocol-row .num{font:10px var(--mono);color:var(--red)}.protocol-row h3{margin:0 0 6px;font-size:19px;letter-spacing:-.035em}.protocol-row p{margin:0;max-width:560px;color:#a9a29c;font-size:13px}
-    .spec-panel{border:1px solid #46403c;background:#111010;padding:26px;position:relative}.spec-panel:before{content:"石";position:absolute;right:20px;top:12px;color:#49242a;font-size:64px;font-family:var(--serif);opacity:.6}.spec-title{font:10px var(--mono);text-transform:uppercase;color:var(--sakura);margin-bottom:18px}.spec-line{display:flex;justify-content:space-between;gap:15px;padding:12px 0;border-top:1px solid #332e2b;font:10px var(--mono)}.spec-line span:first-child{color:#b9b0a9}.spec-line span:last-child{text-align:right;color:#f2ece7}.spec-line .unlimited{color:var(--sakura)!important}
-    .release-layout{display:grid;grid-template-columns:.7fr 1.3fr;gap:50px}.release-heading{position:sticky;top:110px;align-self:start}.release-heading p{max-width:340px;color:#aaa39c}.changelog{border-top:1px solid #3a3430}.change{display:grid;grid-template-columns:105px 1fr;gap:24px;padding:23px 0;border-bottom:1px solid #3a3430}.change time{font-size:9px;color:var(--sakura);padding-top:5px}.change h3{margin:0 0 8px;font-size:18px;letter-spacing:-.035em}.change ul{margin:0;padding-left:17px;color:#a9a29c;font-size:12px}.change li{padding:2px 0}
-    .mosaic-section{background:#0d0c0c}.mosaic-intro{display:flex;justify-content:space-between;align-items:end;gap:26px;margin-bottom:35px}.mosaic-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:13px;align-items:start}.mosaic-grid .item-1{grid-column:span 5}.mosaic-grid .item-2{grid-column:span 3;margin-top:45px}.mosaic-grid .item-3{grid-column:span 4;margin-top:95px}.mosaic-grid .item-4{grid-column:span 3;margin-top:-20px}.mosaic-grid .item-5{grid-column:span 4;margin-top:28px}.mosaic-grid .item-6{grid-column:span 5;margin-top:-10px}.mosaic-grid .item-7{grid-column:span 4;margin-top:18px}.mosaic-grid .item-8{grid-column:span 3;margin-top:65px}.mosaic-grid .item-1 img{aspect-ratio:1.08}.mosaic-grid .item-2 img,.mosaic-grid .item-3 img,.mosaic-grid .item-4 img,.mosaic-grid .item-5 img,.mosaic-grid .item-6 img,.mosaic-grid .item-7 img,.mosaic-grid .item-8 img{aspect-ratio:1;object-fit:cover}
-    .tile-caption{display:flex;align-items:start;justify-content:space-between;gap:14px;padding:10px 12px;background:#111010;border-top:1px solid #36302d}.tile-caption b{font:9px var(--mono);font-weight:400;text-transform:uppercase;color:#f0eae4;letter-spacing:.035em}.tile-caption span{font:8px var(--mono);color:#7f7771;white-space:nowrap}
-    .discord-section{background:linear-gradient(135deg,#100d0e 0%,#090909 65%)}
-    .discord-grid{display:grid;grid-template-columns:1fr .85fr;gap:58px;align-items:center}
-    .discord-copy p{max-width:540px;color:#b0a9a2;line-height:1.8}
-    .presence-window{border:1px solid #544345;background:#111010;box-shadow:17px 17px 0 #6f1420;max-width:470px;justify-self:end;width:100%}
-    .presence-top{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;border-bottom:1px solid #3d3231;font:9px var(--mono);color:#c6bcb5}.presence-leds{display:flex;gap:5px}.presence-leds i{display:block;width:6px;height:6px;border-radius:100%;background:#d9d1ca}.presence-leds i:first-child{background:var(--red)}
-    .presence-body{display:flex;gap:15px;padding:18px}.presence-icon{width:80px;height:80px;flex:0 0 80px;border:1px solid #4b4540;background:#fff;position:relative}.presence-icon img{width:100%;height:100%;object-fit:cover;display:block}.presence-info{min-width:0}.presence-title{font-size:15px;font-weight:750;letter-spacing:-.025em;margin:2px 0 5px}.presence-line{font:10px var(--mono);color:#aaa19b;margin:4px 0}.presence-line strong{font-weight:400;color:var(--sakura)}.presence-buttons{display:flex;gap:7px;flex-wrap:wrap;padding:0 18px 17px}.copy-status{border:1px solid #504641;background:#171515;color:#eee8e2;padding:8px 10px;font:9px var(--mono);cursor:pointer}.copy-status:hover{border-color:var(--sakura);color:var(--sakura)}.toast{min-height:18px;padding:0 18px 10px;color:var(--sakura);font:9px var(--mono)}
-    .footer{padding:54px 0 28px;background:#080808}
-    .footer-main{display:grid;grid-template-columns:1fr auto;gap:28px;padding-bottom:28px;border-bottom:1px solid #332e2b}.footer-brand{font-size:clamp(25px,4vw,44px);font-weight:900;letter-spacing:-.07em}.footer-brand span{color:var(--red)}.footer-desc{max-width:550px;color:#99918b;font-size:12px;line-height:1.75}.credit-mark{font:10px var(--mono);color:#bfb6ae;text-align:right}.credit-mark strong{display:block;color:var(--sakura);font-size:12px;font-weight:400;margin-top:5px}.footer-bottom{display:flex;justify-content:space-between;align-items:start;gap:20px;padding-top:20px;font:9px var(--mono);color:#8f8780}.legal-links{display:flex;gap:18px;flex-wrap:wrap}.legal-links a:hover{color:var(--sakura)}.disclaimer{font-size:10px;line-height:1.7;max-width:840px;color:#6f6863;margin:20px 0 0}
-    .corner-kanji{position:absolute;right:2.5%;top:13%;font:clamp(60px,9vw,130px) var(--serif);color:#a71e2f;opacity:.10;pointer-events:none;z-index:-1;writing-mode:vertical-rl;letter-spacing:.13em}
-    .parallax{will-change:transform}
-    @media (max-width:850px){.nav{gap:14px}.nav a:nth-child(3){display:none}.hero-cover{min-height:580px}.torii-watermark{right:5%;top:5%;width:33vw}.cover-content{max-width:92%}.floating-cube{right:4%;bottom:8%}.studio-grid,.quote-layout,.protocol-grid,.release-layout,.discord-grid{grid-template-columns:1fr}.studio-note,.release-heading{position:static}.studio-note{max-width:580px}.studio-cubes{max-width:580px}.section-head{align-items:start;flex-direction:column}.section-intro{max-width:580px}.quote-layout{gap:28px}.world-bottom{margin-top:30px}.world-bottom .image-tile:nth-child(2){transform:none}.protocol-grid{gap:36px}.spec-panel{max-width:620px}.release-layout{gap:24px}.discord-grid{gap:36px}.presence-window{justify-self:start}.mosaic-grid .item-1{grid-column:span 6}.mosaic-grid .item-2{grid-column:span 6;margin-top:35px}.mosaic-grid .item-3{grid-column:span 4;margin-top:0}.mosaic-grid .item-4{grid-column:span 4;margin-top:22px}.mosaic-grid .item-5{grid-column:span 4;margin-top:0}.mosaic-grid .item-6{grid-column:span 6;margin-top:15px}.mosaic-grid .item-7{grid-column:span 3;margin-top:15px}.mosaic-grid .item-8{grid-column:span 3;margin-top:48px}}
-    @media (max-width:600px){.wrap{width:min(calc(100% - 28px),var(--max))}.topbar-inner{min-height:64px;gap:10px}.brand-image{width:32px;height:32px}.brand-title{font-size:12px}.brand-sub{font-size:8px}.nav{display:none}.lang-btn,.line-btn,.red-btn{min-height:35px;padding:8px 10px}.hero{padding:30px 0 34px}.hero-top{align-items:start}.hero-code{max-width:120px;font-size:8px}.hero-cover{min-height:570px}.cover-content{padding:22px;padding-bottom:90px}.cover-content h1{font-size:clamp(54px,16vw,92px);margin:21px 0}.cover-copy{font-size:14px}.cover-quote{font-size:12px;margin-top:20px}.cover-meta{left:18px;right:18px;bottom:14px;justify-content:start;font-size:8px}.floating-cube{width:82px;right:15px;top:35%;bottom:auto;border-width:4px}.torii-watermark{width:42vw;top:8%;right:0}.hero-footer{font-size:8px;line-height:1.7;align-items:start}.hero-footer span:last-child{text-align:right}.ticker-inner{justify-content:flex-start;gap:24px;padding:0 15px;min-height:44px;font-size:9px}.section{padding:65px 0}.section-head{margin-bottom:27px;gap:18px}.section-title{font-size:clamp(35px,11vw,55px)}.section-intro{font-size:13px}.studio-grid{gap:25px}.daw-titlebar{padding:11px}.daw-brand{font-size:9px}.daw-version{font-size:8px}.daw-screen{grid-template-columns:92px minmax(0,1fr)}.track-name{padding:8px;font-size:8px}.track-name span{font-size:7px}.ruler span{padding:5px 3px;font-size:7px}.clip{font-size:7px;padding:3px}.daw-output{align-items:start;flex-direction:column;gap:7px}.meter{width:100%}.studio-cubes{gap:8px}.quote-item{grid-template-columns:1fr auto;gap:8px;padding:16px 0}.quote-stamp{grid-column:1 / -1}.quote-text{font-size:20px}.world-bottom{grid-template-columns:1fr 1fr}.world-bottom .image-tile:last-child{display:none}.protocol-row{grid-template-columns:27px 1fr;gap:10px}.protocol-row h3{font-size:17px}.spec-panel{padding:20px}.spec-line{font-size:9px}.change{grid-template-columns:76px 1fr;gap:12px;padding:20px 0}.change h3{font-size:16px}.change ul{font-size:11px}.mosaic-intro{align-items:start;flex-direction:column}.mosaic-grid{gap:8px}.mosaic-grid .item-1{grid-column:span 7}.mosaic-grid .item-2{grid-column:span 5;margin-top:40px}.mosaic-grid .item-3{grid-column:span 5;margin-top:0}.mosaic-grid .item-4{grid-column:span 7;margin-top:18px}.mosaic-grid .item-5{grid-column:span 6;margin-top:2px}.mosaic-grid .item-6{grid-column:span 6;margin-top:20px}.mosaic-grid .item-7{grid-column:span 7;margin-top:0}.mosaic-grid .item-8{grid-column:span 5;margin-top:37px}.tile-caption{padding:8px}.tile-caption b{font-size:8px}.tile-caption span{font-size:7px}.presence-window{box-shadow:8px 8px 0 #6f1420}.presence-body{padding:13px;gap:11px}.presence-icon{width:65px;height:65px;flex-basis:65px}.presence-title{font-size:13px}.presence-line{font-size:9px}.footer-main{grid-template-columns:1fr;gap:19px}.credit-mark{text-align:left}.footer-bottom{flex-direction:column;gap:15px}.legal-links{gap:12px}.corner-kanji{right:0;top:10%;font-size:70px}}
-    @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}.parallax{transform:none!important}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090909">
+<title>MOAI Studio 21 — a JVR_Prod side project</title>
+<meta name="description" content="MOAI Studio 21: a fictional stone-age audio workstation, a parody shelf of artifacts and moai with problems. Fan project, not affiliated with Exyl.">
+<style>
+:root{--k:#090909;--k2:#141414;--w:#f4f1eb;--mute:#a09c95;--line:#36322f;--red:#c52335;--sak:#e7a2b0;--max:1180px;
+--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--sans:"Helvetica Neue",Arial,system-ui,sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--k);color:var(--w);font:16px/1.6 var(--sans);overflow-x:hidden}
+a{color:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--sak);outline-offset:3px}
+.wrap{width:min(100% - 40px,var(--max));margin-inline:auto}
+.top{position:sticky;top:0;z-index:20;background:#090909ee;backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:60px}
+.logo{font:700 18px var(--serif);text-decoration:none;letter-spacing:.01em}.logo b{color:var(--red)}
+nav{display:flex;gap:22px;font-size:14px}nav a{text-decoration:none;color:var(--mute)}nav a:hover{color:var(--sak)}
+.lang{background:none;border:1px solid var(--mute);color:var(--w);padding:7px 14px;font:600 13px var(--sans);cursor:pointer;border-radius:2px}
+.lang:hover{border-color:var(--sak);color:var(--sak)}
+/* checker placeholder */
+.ph{position:relative;background:#1a1a1a repeating-conic-gradient(#222 0 25%,#151515 0 50%) 0 0/28px 28px;overflow:hidden}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* hero */
+.hero{position:relative;min-height:calc(100vh - 60px);display:grid;align-items:end;padding:40px 0 34px;overflow:hidden;border-bottom:1px solid var(--line)}
+.hero .ph{position:absolute;inset:0;opacity:.5}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#09090900 20%,#090909 96%)}
+.hero .wrap{position:relative;z-index:2}
+.torii{position:absolute;right:4%;top:8%;width:min(34vw,360px);z-index:1;opacity:.9}
+.petal{position:absolute;z-index:1;width:14px;height:10px;background:var(--sak);border-radius:80% 0 80% 0;opacity:.8}
+h1{font:800 clamp(64px,15vw,200px)/.82 var(--serif);letter-spacing:-.04em;margin:0 0 22px}
+h1 span{display:block;color:var(--red);font-style:italic;font-weight:600;padding-left:.5em}
+.lede{max-width:560px;font-size:19px;margin:0 0 22px}
+.motto{display:inline-block;border-left:3px solid var(--red);padding:6px 14px;font:italic 17px var(--serif);background:#00000088}
+.motto small{display:block;font:12px var(--sans);color:var(--mute);font-style:normal}
+.flute{display:block;width:min(100%,640px);margin-top:26px}
+/* ticker */
+.tick{background:var(--red);color:#fff;overflow:hidden;white-space:nowrap;font:700 15px var(--serif);padding:9px 0}
+.tick div{display:inline-block;padding-left:100%;animation:t 38s linear infinite}
+@keyframes t{to{transform:translateX(-100%)}}
+section{padding:96px 0;border-bottom:1px solid var(--line)}
+h2{font:700 clamp(34px,5.4vw,64px)/1 var(--serif);letter-spacing:-.02em;margin:0 0 14px;max-width:14ch}
+.intro{max-width:520px;color:var(--mute);margin:0 0 44px}
+/* shelf */
+.notice{border:1px dashed var(--sak);color:var(--sak);padding:12px 16px;font-size:14px;max-width:780px;margin-bottom:48px}
+.shelf{display:grid;grid-template-columns:repeat(12,1fr);gap:34px 26px;align-items:end}
+.item{display:block;text-decoration:none;position:relative}
+.item.xl{grid-column:span 5}.item.m{grid-column:span 3}.item.s{grid-column:span 4}.item.w{grid-column:span 4}
+.item .ph{aspect-ratio:1;border:1px solid #4a4541;transition:transform .25s}
+.item.w .ph{aspect-ratio:4/3}
+.item:hover .ph,.item:focus-visible .ph{transform:translateY(-6px) rotate(-.6deg)}
+.tag{position:absolute;top:12px;left:-6px;background:var(--w);color:var(--k);font:700 13px var(--serif);padding:4px 10px;z-index:2}
+.cap{padding:12px 0 0;border-top:3px solid var(--red);margin-top:12px}
+.cap h3{font:700 19px/1.2 var(--serif);margin:0 0 4px}
+.cap p{margin:0 0 6px;color:var(--mute);font-size:14px;line-height:1.45}
+.ext{font:600 12px var(--sans);color:var(--sak)}
+.shelf .item:nth-child(even){margin-top:30px}
+/* voices */
+.voices{display:grid;grid-template-columns:repeat(12,1fr);gap:26px}
+.v{grid-column:span 4;border-top:1px solid var(--w);padding-top:16px}
+.v:nth-child(1),.v:nth-child(6){grid-column:span 6}
+.v q{display:block;font:italic 21px/1.35 var(--serif);quotes:"“" "”"}
+.v cite{display:flex;gap:12px;align-items:center;margin-top:16px;font-style:normal;font-size:13px;color:var(--mute)}
+.v cite .ph{width:46px;height:46px;flex:none;border:1px solid var(--mute)}
+.v cite b{color:var(--w);display:block;font-size:14px}
+.v.red q{color:var(--sak)}
+/* mini daw */
+.daw{border:1px solid var(--line);background:var(--k2);padding:16px;max-width:760px;margin-top:50px;font:12px ui-monospace,Menlo,monospace}
+.lane{display:flex;gap:4px;height:26px;margin-top:6px}.lane i{display:block;background:#2a2a2a;border:1px solid #555;flex:1;font-style:normal;padding:3px 6px;overflow:hidden;white-space:nowrap}
+.lane i.r{background:var(--red);border-color:var(--red)}.lane i.p{background:var(--sak);color:#000;border-color:var(--sak)}
+footer{padding:50px 0;color:var(--mute);font-size:14px}footer a{color:var(--w)}
+footer p{max-width:720px}
+@media(max-width:820px){nav{display:none}.item.xl,.item.m,.item.s,.item.w{grid-column:span 12}.shelf .item:nth-child(even){margin-top:0}
+.v,.v:nth-child(1),.v:nth-child(6){grid-column:span 12}.torii{opacity:.5}section{padding:64px 0}}
+@media(max-width:1100px) and (min-width:821px){.item.xl{grid-column:span 6}.item.m,.item.s,.item.w{grid-column:span 6}}
+@media(prefers-reduced-motion:reduce){.tick div{animation:none;padding-left:0}html{scroll-behavior:auto}.item .ph{transition:none}}
+</style>
 </head>
 <body>
-  <a class="skip" href="#main" data-en="Skip to content" data-ru="Перейти к содержимому">Skip to content</a>
-  <header class="topbar">
-    <div class="wrap topbar-inner">
-      <a class="brand" href="#top" aria-label="MOAI Studio 21 home">
-        <img class="brand-image" src="assets/memes/00-brand-moai.jpg" alt="MOAI image placeholder" data-alt-en="MOAI image placeholder" data-alt-ru="Заглушка для изображения моаи">
-        <span class="brand-copy"><span class="brand-title">MOAI Studio 21</span><span class="brand-sub" data-en="A JVR_PROD SIDE PROJECT" data-ru="ПОБОЧНЫЙ ПРОЕКТ JVR_PROD">A JVR_PROD SIDE PROJECT</span></span>
-      </a>
-      <nav class="nav" aria-label="Main navigation">
-        <a href="#studio" data-en="The studio" data-ru="Студия">The studio</a>
-        <a href="#world" data-en="The universe" data-ru="Вселенная">The universe</a>
-        <a href="#fragments" data-en="Image fragments" data-ru="Фрагменты">Image fragments</a>
-        <a href="#presence" data-en="Discord status" data-ru="Статус Discord">Discord status</a>
-      </nav>
-      <div class="top-actions"><button class="lang-btn" id="langToggle" type="button" aria-label="Switch language to Russian" aria-pressed="false">EN / RU</button></div>
-    </div>
-  </header>
+<header class="top"><div class="wrap">
+<a class="logo" href="#top">MOAI <b>Studio</b> 21</a>
+<nav aria-label="Main"><a href="#shelf" data-en="The shelf" data-ru="Полка">The shelf</a><a href="#voices" data-en="Voices" data-ru="Голоса">Voices</a><a href="#studio" data-en="Studio" data-ru="Студия">Studio</a></nav>
+<button class="lang" id="lang" type="button" aria-label="Switch language">EN / RU</button>
+</div></header>
+<main>
+<section class="hero" id="top" style="padding-top:40px">
+<div class="ph"><img src="assets/memes/01-hero-cover.jpg" alt="" onerror="this.remove()"></div>
+<svg class="torii par" data-p="-.08" viewBox="0 0 260 230" aria-hidden="true"><path d="M20 44Q130 8 240 44L232 58Q130 32 28 58Z" fill="#c52335"/><path d="M41 57h17v131H41zM202 57h17v131h-17z" fill="#c52335"/><path d="M29 78h202v13H29z" fill="#c52335"/><path d="M28 188h204v14H28z" fill="#c52335"/></svg>
+<i class="petal par" data-p="-.15" style="left:58%;top:22%"></i><i class="petal par" data-p=".1" style="left:76%;top:44%"></i><i class="petal par" data-p="-.05" style="left:34%;top:30%"></i>
+<div class="wrap">
+<h1>MOAI<span>Studio 21</span></h1>
+<p class="lede" data-en="A workstation for a civilization that found the flute before language, a shelf of artifacts, and several moai with problems." data-ru="Студия для цивилизации, которая нашла флейту раньше языка, полка артефактов и несколько моаи со своими проблемами.">A workstation for a civilization that found the flute before language, a shelf of artifacts, and several moai with problems.</p>
+<div class="motto">“MOAI make BRrrrAM BAM BAM BA-Bam = MOAI hapy)))”<small data-en="Studio motto, translation pending" data-ru="Девиз студии (на перевод v1)">Studio motto, translation pending</small></div>
+<svg class="flute" viewBox="0 0 640 40" role="img" aria-label="Flute"><rect x="6" y="12" width="628" height="16" rx="8" fill="#f4f1eb"/><g fill="#090909"><circle cx="150" cy="20" r="4"/><circle cx="210" cy="20" r="4"/><circle cx="270" cy="20" r="4"/><circle cx="360" cy="20" r="4"/><circle cx="420" cy="20" r="4"/><circle cx="480" cy="20" r="4"/></g><rect x="60" y="12" width="6" height="16" fill="#c52335"/><rect x="560" y="12" width="6" height="16" fill="#c52335"/></svg>
+</div></section>
+<div class="tick" aria-hidden="true"><div>FLUTE GANG ✿ MAKE THE DROP ✿ 石の音 ✿ STONE NEVER CRACKS (IN THE MIX) ✿ FLUTE GANG ✿ QUESTION THE MASTER ✿ 21 / 21 / 21 ✿</div></div>
 
-  <main id="main">
-    <section class="hero" id="top">
-      <div class="wrap">
-        <div class="hero-top"><span class="eyebrow" data-en="Independent stone audio research" data-ru="Независимые исследования каменного звука">Independent stone audio research</span><span class="hero-code" data-en="JVR_Prod / FIELD NOTES 021" data-ru="JVR_Prod / ПОЛЕВЫЕ ЗАМЕТКИ 021">JVR_Prod / FIELD NOTES 021</span></div>
-        <div class="hero-cover">
-          <!-- IMAGE REPLACEMENT: every slot has a uniquely named checkerboard JPG in assets/memes/. Replace that file with your image and keep the filename, or change its img src. assets/фон.jpg is the master checkerboard. -->
-          <!-- IMAGE SLOT 01: replace assets/memes/01-hero-cover.jpg with your own wide photo (16:10 or 16:9). Keep the overlay for readable type. -->
-          <img class="cover-image" src="assets/memes/01-hero-cover.jpg" alt="Large hero photo placeholder for a Moai portrait" data-alt-en="Large hero photo placeholder for a Moai portrait" data-alt-ru="Заглушка большой обложки для фотографии моаи">
-          <div class="cover-grid"></div>
-          <svg class="torii-watermark parallax" data-parallax="-0.09" viewBox="0 0 260 230" aria-hidden="true">
-            <path d="M20 44 Q130 8 240 44 L232 58 Q130 32 28 58 Z" fill="#c52335"/>
-            <path d="M41 57 L58 57 L58 188 L41 188 Z M202 57 L219 57 L219 188 L202 188 Z" fill="#c52335"/>
-            <path d="M29 78 L231 78 L231 91 L29 91 Z" fill="#c52335"/>
-            <path d="M28 188 L232 188 L232 202 L28 202 Z" fill="#c52335"/>
-            <path d="M21 43 Q130 16 239 43" fill="none" stroke="#f2b0ba" stroke-width="1.5"/>
-          </svg>
-          <i class="sakura-petal petal-a parallax" data-parallax="-0.16"></i><i class="sakura-petal petal-b parallax" data-parallax="0.1"></i><i class="sakura-petal petal-c parallax" data-parallax="-0.06"></i>
-          <div class="cover-content parallax" data-parallax="0.025">
-            <div class="eyebrow" data-en="The stone has entered the chat" data-ru="Камень подключился к чату">The stone has entered the chat</div>
-            <h1>MOAI<br><span>Studio 21</span></h1>
-            <p class="cover-copy" data-en="An entirely serious audio workstation for a civilization that discovered bass before language." data-ru="Предельно серьёзная аудиостанция цивилизации, которая открыла бас раньше языка.">An entirely serious audio workstation for a civilization that discovered bass before language.</p>
-            <div class="cover-quote"><span data-en="“MOAI make BRrrrAM BAM BAM BA-Bam = MOAI hapy)))”" data-ru="(MOAI make BRrrrAM BAM BAM BA-Bam = MOAI hapy))) (на перевод v1)">“MOAI make BRrrrAM BAM BAM BA-Bam = MOAI hapy)))”</span><small data-en="Ancient studio motto / translation pending" data-ru="Девиз древней студии / перевод ожидается">Ancient studio motto / translation pending</small></div>
-          </div>
-          <div class="floating-cube parallax" data-parallax="-0.12">
-            <!-- IMAGE SLOT 02: replace assets/memes/02-floating-moai-cube.jpg with a square Moai sticker, reaction, or project icon. -->
-            <img src="assets/memes/02-floating-moai-cube.jpg" alt="Square Moai sticker placeholder" data-alt-en="Square Moai sticker placeholder" data-alt-ru="Заглушка квадратного стикера моаи">
-            <span class="photo-label">MOAI / 001</span>
-          </div>
-          <div class="cover-meta"><span class="meta-chip red" data-en="Stone-built audio" data-ru="Звук из камня">Stone-built audio</span><span class="meta-chip" data-en="EST. WHENEVER" data-ru="ГОД ОСНОВАНИЯ: КОГДА-НИБУДЬ">EST. WHENEVER</span><span class="meta-chip" data-en="NO HUMAN FEELINGS" data-ru="НЕТ ЧЕЛОВЕЧЕСКИХ ЧУВСТВ">NO HUMAN FEELINGS</span></div>
-        </div>
-        <div class="hero-footer"><span data-en="A fictional workstation. A very real amount of confidence." data-ru="Вымышленная студия. Совершенно реальный избыток уверенности.">A fictional workstation. A very real amount of confidence.</span><span class="red-mark" data-en="石の音 / SOUND FROM STONE" data-ru="石の音 / ЗВУК ИЗ КАМНЯ">石の音 / SOUND FROM STONE</span></div>
-      </div>
-    </section>
+<section id="shelf"><div class="wrap">
+<h2 data-en="The shelf" data-ru="Полка">The shelf</h2>
+<p class="intro" data-en="Things you would absolutely buy, if they existed." data-ru="Вещи, которые вы бы точно купили, если бы они существовали.">Things you would absolutely buy, if they existed.</p>
+<div class="notice" role="note" data-en="Parody shelf. Nothing here is for sale, and none of it is made or endorsed by Exyl. Every item opens a real Exyl video on YouTube — that is the whole joke. No cart, no payments." data-ru="Пародийная витрина. Ничего из этого не продаётся и не создано и не одобрено Exyl. Каждый товар открывает настоящее видео Exyl на YouTube — в этом вся шутка. Ни корзины, ни платежей.">Parody shelf.</div>
+<div class="shelf" id="shelfGrid"></div>
+</div></section>
 
-    <div class="ticker" aria-label="Studio ticker"><div class="ticker-inner"><span data-en="MOAI SYSTEMS <b>///</b>" data-ru="СИСТЕМЫ MOAI <b>///</b>">MOAI SYSTEMS <b>///</b></span><span data-en="MAKE THE DROP" data-ru="СОЗДАЙ ДРОП">MAKE THE DROP</span><span class="flower">✿</span><span data-en="QUESTION THE MASTER" data-ru="СОМНЕВАЙСЯ В МАСТЕРЕ">QUESTION THE MASTER</span><span><b>21</b> / 21 / 21</span><span data-en="STONE NEVER CRACKS (IN THE MIX)" data-ru="КАМЕНЬ НЕ ТРЕЩИТ (В МИКСЕ)">STONE NEVER CRACKS (IN THE MIX)</span><span class="flower">✿</span></div></div>
+<section id="voices"><div class="wrap">
+<h2 data-en="Moai, off the clock" data-ru="Моаи после смены">Moai, off the clock</h2>
+<p class="intro" data-en="Original fictional lines. Not quotes from real people." data-ru="Оригинальные вымышленные реплики. Не цитаты реальных людей.">Original fictional lines.</p>
+<div class="voices" id="voiceGrid"></div>
+</div></section>
 
-    <section class="section" id="studio">
-      <div class="wrap">
-        <div class="section-head"><div><div class="eyebrow" data-en="01 / Inside the workstation" data-ru="01 / Внутри рабочей станции">01 / Inside the workstation</div><h2 class="section-title" data-en="A DAW with a <em>stone-cold</em> workflow." data-ru="DAW с <em>каменно-спокойным</em> процессом.">A DAW with a <em>stone-cold</em> workflow.</h2></div><p class="section-intro" data-en="Not a real audio engine. A visual record of what happens when a loop gets promoted to project lead." data-ru="Это не настоящий аудиодвижок. Это визуальный отчёт о том, что происходит, когда луп назначают руководителем проекта.">Not a real audio engine. A visual record of what happens when a loop gets promoted to project lead.</p></div>
-        <div class="studio-grid">
-          <aside class="studio-note"><div class="eyebrow" data-en="Session file / 00021" data-ru="Файл сессии / 00021">Session file / 00021</div><h3 data-en="Eight bars.<br>One vision.<br>No revisions." data-ru="Восемь тактов.<br>Одно видение.<br>Без правок.">Eight bars.<br>One vision.<br>No revisions.</h3><p data-en="The arrangement is technically unfinished. The confidence is fully mastered. Nobody is allowed to ask what happens after bar eight." data-ru="Аранжировка формально не закончена. Уверенность полностью отмастерена. Никому не разрешено спрашивать, что происходит после восьмого такта.">The arrangement is technically unfinished. The confidence is fully mastered. Nobody is allowed to ask what happens after bar eight.</p><div class="rule"></div><div class="readout"><div>ENGINE STATUS / <strong id="engineState">IDLE / ANCIENT</strong></div><div>MASTER PEAK / <strong id="peakState">+∞ DB (SPIRITUAL)</strong></div><div>ARRANGEMENT / 8 BARS / <strong>ETERNAL</strong></div></div><div class="studio-cubes">
-            <figure class="image-tile tile-square"><span class="photo-tape"></span><!-- IMAGE SLOT 03: replace assets/memes/03-plugin-detail.jpg with a DAW parody, plugin panel, or studio meme. --><img src="assets/memes/03-plugin-detail.jpg" alt="Studio-detail image placeholder" data-alt-en="Studio-detail image placeholder" data-alt-ru="Заглушка изображения детали студии"><figcaption class="image-caption" data-en="The plugin that fixed nothing" data-ru="Плагин, который ничего не исправил">The plugin that fixed nothing</figcaption></figure>
-            <figure class="image-tile tile-square"><!-- IMAGE SLOT 04: replace assets/memes/04-producer-reaction.jpg with your own producer-reaction meme. --><img src="assets/memes/04-producer-reaction.jpg" alt="Producer reaction image placeholder" data-alt-en="Producer reaction image placeholder" data-alt-ru="Заглушка реакции продюсера"><figcaption class="image-caption" data-en="Listening on laptop speakers" data-ru="Прослушивание на динамиках ноутбука">Listening on laptop speakers</figcaption></figure>
-          </div></aside>
-          <div class="daw-frame" id="fakeDaw">
-            <div class="daw-titlebar"><div class="daw-brand"><span class="daw-sigil">M</span><span>MOAI STUDIO 21</span></div><div class="daw-version" data-en="BUILD 21.∞ / STONE EDITION" data-ru="СБОРКА 21.∞ / КАМЕННОЕ ИЗДАНИЕ">BUILD 21.∞ / STONE EDITION</div></div>
-            <div class="daw-toolbar"><button class="daw-control" id="playBtn" type="button" aria-pressed="false">▶ PLAY LOOP</button><button class="daw-control" id="bakeBtn" type="button" aria-pressed="false" data-en="BAKE THE DROP" data-ru="ЗАКАЛИТЬ ДРОП">BAKE THE DROP</button><button class="daw-control" id="resetBtn" type="button" data-en="RESET THE RITUAL" data-ru="СБРОСИТЬ РИТУАЛ">RESET THE RITUAL</button><span class="daw-clock" id="dawClock">BAR 009 / LOOP ∞</span></div>
-            <div class="daw-screen"><div class="track-names"><div class="track-name" data-en="KICK / 01" data-ru="БОЧКА / 01">KICK / 01<span data-en="TECTONIC IMPACT" data-ru="ТЕКТОНИЧЕСКИЙ УДАР">TECTONIC IMPACT</span></div><div class="track-name">808 / 02<span data-en="BASEMENT SHIFTER" data-ru="СДВИГ ФУНДАМЕНТА">BASEMENT SHIFTER</span></div><div class="track-name" data-en="LEAD / 03" data-ru="ЛИД / 03">LEAD / 03<span data-en="ANCIENT WARNING" data-ru="ДРЕВНЕЕ ПРЕДУПРЕЖДЕНИЕ">ANCIENT WARNING</span></div><div class="track-name" data-en="FX / 04" data-ru="ЭФФЕКТЫ / 04">FX / 04<span data-en="DOOR TO ANOTHER ERA" data-ru="ДВЕРЬ В ДРУГУЮ ЭРУ">DOOR TO ANOTHER ERA</span></div></div><div class="timeline"><div class="ruler"><span>001</span><span>002</span><span>003</span><span>004</span><span>005</span><span>006</span><span>007</span><span>008</span></div><div class="lane"><div class="clip" style="left:2%;width:47%"><span>STONE_KICK_01.wav</span></div><div class="clip" style="left:52%;width:45%"><span>STONE_KICK_01.wav</span></div></div><div class="lane"><div class="clip white" style="left:2%;width:95%"><span>SUB_FOUNDATION / DO NOT MOVE</span></div></div><div class="lane"><div class="clip pink" style="left:2%;width:21%"><span>LEAD_A</span></div><div class="clip pink" style="left:27%;width:21%"><span>LEAD_A_AGAIN</span></div><div class="clip pink" style="left:52%;width:21%"><span>LEAD_A_FINAL</span></div><div class="clip pink" style="left:77%;width:20%"><span>LEAD_A_FINAL2</span></div></div><div class="lane"><div class="clip white" style="left:8%;width:16%"><span>WHOOSH</span></div><div class="clip" style="left:29%;width:18%"><span>STONE HIT</span></div><div class="clip white" style="left:52%;width:16%"><span>WHOOSH 2</span></div><div class="clip" style="left:75%;width:20%"><span>ANCESTOR FX</span></div></div></div></div>
-            <div class="piano"><div class="piano-head"><span data-en="MIDI / ONE NOTE OF DESTINY" data-ru="MIDI / ОДНА НОТА СУДЬБЫ">MIDI / ONE NOTE OF DESTINY</span><span data-en="KEY: WHATEVER WORKS" data-ru="ТОНАЛЬНОСТЬ: КАК ПОЛУЧИТСЯ">KEY: WHATEVER WORKS</span></div><div class="piano-grid"><i class="note" style="grid-column:2 / span 2;grid-row:1"></i><i class="note red" style="grid-column:5 / span 3;grid-row:2"></i><i class="note pink" style="grid-column:9 / span 2;grid-row:1"></i><i class="note" style="grid-column:12 / span 4;grid-row:3"></i><i class="note red" style="grid-column:14 / span 2;grid-row:4"></i></div></div>
-            <div class="daw-output"><span id="dawOutput"><strong>MASTER BUS:</strong> spiritually peaking at +∞ dB</span><div class="meter" aria-label="Fake peak meter"><span id="meterFill"></span></div></div>
-          </div>
-        </div>
-      </div>
-    </section>
+<section id="studio"><div class="wrap">
+<h2 data-en="Eight bars. No revisions." data-ru="Восемь тактов. Без правок.">Eight bars. No revisions.</h2>
+<p class="intro" data-en="The arrangement is unfinished. The flute track is not negotiable." data-ru="Аранжировка не закончена. Дорожка флейты обсуждению не подлежит.">The arrangement is unfinished.</p>
+<div class="daw" aria-label="Fake DAW timeline">
+<div>MOAI STUDIO 21 · BUILD 21.∞</div>
+<div class="lane"><i class="r">STONE_KICK_01</i><i>STONE_KICK_01</i></div>
+<div class="lane"><i>SUB_FOUNDATION / DO NOT MOVE</i></div>
+<div class="lane"><i class="p">FLUTE_A</i><i class="p">FLUTE_A_AGAIN</i><i class="p">FLUTE_FINAL2</i><i class="p">FLUTE_FINAL2_REAL</i></div>
+</div>
+</div></section>
+</main>
+<footer><div class="wrap">
+<p data-en="MOAI Studio 21 is an unofficial fan and parody project by JVR_Prod. Exyl, his videos and characters belong to their creator; shelf items link to his official videos on YouTube and are not affiliated with or endorsed by him." data-ru="MOAI Studio 21 — неофициальный фанатский и пародийный проект JVR_Prod. Exyl, его видео и персонажи принадлежат автору; товары полки ведут на его официальные видео на YouTube и не связаны с ним и не одобрены им.">Unofficial fan project.</p>
+<p><a href="terms.html">Terms of Service</a> · <a href="privacy.html">Privacy Policy</a></p>
+</div></footer>
 
-    <section class="section world" id="world">
-      <span class="corner-kanji parallax" data-parallax="0.06" aria-hidden="true">石の音</span>
-      <div class="wrap">
-        <div class="section-head"><div><div class="eyebrow" data-en="02 / The MOAI multiverse" data-ru="02 / Мультивселенная MOAI">02 / The MOAI multiverse</div><h2 class="section-title" data-en="Every stone has a <em>side quest.</em>" data-ru="У каждого камня есть <em>побочный квест.</em>">Every stone has a <em>side quest.</em></h2></div><p class="section-intro" data-en="Somewhere between the money era, the samurai era, and the 900th export, the lore became self-sustaining." data-ru="Где-то между эпохой денег, эпохой самураев и девятисотым экспортом лор научился поддерживать себя самостоятельно.">Somewhere between the money era, the samurai era, and the 900th export, the lore became self-sustaining.</p></div>
-        <div class="quote-layout"><div class="quote-lead"><div class="eyebrow" data-en="Recovered transmissions" data-ru="Перехваченные сообщения">Recovered transmissions</div><p data-en="These are original, fictional lines from the MOAI Studio universe — not quotes from real artists. The only canon is that the stone keeps going." data-ru="Это оригинальные вымышленные реплики из вселенной MOAI Studio, а не цитаты реальных артистов. Единственный канон — камень продолжает идти.">These are original, fictional lines from the MOAI Studio universe — not quotes from real artists. The only canon is that the stone keeps going.</p><figure class="image-tile tile-portrait"><!-- IMAGE SLOT 05: replace assets/memes/05-moai-money.jpg with a square or portrait image for the fictional money chapter. --><img src="assets/memes/05-moai-money.jpg" alt="Moai Money era image placeholder" data-alt-en="Moai Money era image placeholder" data-alt-ru="Заглушка изображения эпохи MOAI MONEY"><figcaption class="image-caption" data-en="MOAI MONEY / CHAPTER 01" data-ru="MOAI MONEY / ГЛАВА 01">MOAI MONEY / CHAPTER 01</figcaption></figure></div>
-          <div><div class="quote-list">
-            <article class="quote-item"><div class="quote-stamp">MOAI MONEY</div><div class="quote-text" data-en="“A stone can’t pay rent. <em>But it can invoice the universe.</em>”" data-ru="«Камень не может платить за жильё. <em>Зато может выставить счёт вселенной.</em>»">“A stone can’t pay rent. <em>But it can invoice the universe.</em>”</div><div class="quote-index">01 / ¥</div></article>
-            <article class="quote-item"><div class="quote-stamp">MOAI SAMURAI</div><div class="quote-text" data-en="“The drop is a blade. The silence is the sheath.”" data-ru="«Дроп — это клинок. Тишина — ножны.»">“The drop is a blade. The silence is the sheath.”</div><div class="quote-index">02 / 刃</div></article>
-            <article class="quote-item"><div class="quote-stamp">MOAI AFTER HOURS</div><div class="quote-text" data-en="“I exported the silence. It peaked at <em>minus infinity.</em>”" data-ru="«Я экспортировал тишину. Пик достиг <em>минус бесконечности.</em>»">“I exported the silence. It peaked at <em>minus infinity.</em>”</div><div class="quote-index">03 / −∞</div></article>
-            <article class="quote-item"><div class="quote-stamp">MOAI COUNCIL</div><div class="quote-text" data-en="“We are not overcompressed. We are <em>historically dense.</em>”" data-ru="«Мы не пережали звук. Мы <em>исторически плотные.</em>»">“We are not overcompressed. We are <em>historically dense.</em>”</div><div class="quote-index">04 / 0 DB</div></article>
-          </div><p class="quote-note" data-en="All quotes are fictional / written for MOAI Studio 21" data-ru="Все реплики вымышлены / написаны для MOAI Studio 21">All quotes are fictional / written for MOAI Studio 21</p></div></div>
-        <div class="world-bottom">
-          <figure class="image-tile tile-square"><!-- IMAGE SLOT 06: replace assets/memes/06-moai-samurai.jpg with a Moai warrior, torii, or red-detail image. --><img src="assets/memes/06-moai-samurai.jpg" alt="Moai Samurai chapter image placeholder" data-alt-en="Moai Samurai chapter image placeholder" data-alt-ru="Заглушка изображения главы MOAI SAMURAI"><figcaption class="image-caption" data-en="MOAI SAMURAI / CHAPTER 02" data-ru="MOAI SAMURAI / ГЛАВА 02">MOAI SAMURAI / CHAPTER 02</figcaption></figure>
-          <figure class="image-tile tile-square"><!-- IMAGE SLOT 07: replace assets/memes/07-after-hours.jpg with a late-night producer meme or studio image. --><img src="assets/memes/07-after-hours.jpg" alt="Moai After Hours image placeholder" data-alt-en="Moai After Hours image placeholder" data-alt-ru="Заглушка изображения MOAI AFTER HOURS"><figcaption class="image-caption" data-en="AFTER HOURS / THE LAST EXPORT" data-ru="ПОСЛЕ ПОЛУНОЧИ / ПОСЛЕДНИЙ ЭКСПОРТ">AFTER HOURS / THE LAST EXPORT</figcaption></figure>
-          <figure class="image-tile tile-square"><!-- IMAGE SLOT 08: replace assets/memes/08-multiverse-canon.jpg with a future community inside joke. --><img src="assets/memes/08-multiverse-canon.jpg" alt="MOAI multiverse image placeholder" data-alt-en="MOAI multiverse image placeholder" data-alt-ru="Заглушка изображения мультивселенной MOAI"><figcaption class="image-caption" data-en="UNCONFIRMED / PROBABLY CANON" data-ru="НЕ ПОДТВЕРЖДЕНО / ВОЗМОЖНО КАНОН">UNCONFIRMED / PROBABLY CANON</figcaption></figure>
-        </div>
-      </div>
-    </section>
-
-    <section class="section code-section" id="protocol">
-      <div class="wrap">
-        <div class="section-head"><div><div class="eyebrow" data-en="03 / The production code" data-ru="03 / Кодекс продакшена">03 / The production code</div><h2 class="section-title" data-en="Craft first. <em>Questionably.</em>" data-ru="Сначала мастерство. <em>Потом сомнения.</em>">Craft first. <em>Questionably.</em></h2></div><p class="section-intro" data-en="A small set of studio rules, carved into the desk after a very long mix session." data-ru="Короткий свод правил, вырезанный на столе после очень долгой сессии сведения.">A small set of studio rules, carved into the desk after a very long mix session.</p></div>
-        <div class="protocol-grid"><div class="protocol-list">
-          <article class="protocol-row"><span class="num">01</span><div><h3 data-en="If the loop works, do not make eye contact with the arrangement." data-ru="Если луп работает, не смотрите в глаза аранжировке.">If the loop works, do not make eye contact with the arrangement.</h3><p data-en="It will ask you to write a bridge. You are not emotionally prepared." data-ru="Она попросит написать переход. Вы эмоционально не готовы.">It will ask you to write a bridge. You are not emotionally prepared.</p></div></article>
-          <article class="protocol-row"><span class="num">02</span><div><h3 data-en="Every new plugin must justify its place in the village." data-ru="Каждый новый плагин должен оправдать своё место в деревне.">Every new plugin must justify its place in the village.</h3><p data-en="The village currently has 47 compressors and no finished chorus." data-ru="В деревне уже 47 компрессоров, но ни одного законченного припева.">The village currently has 47 compressors and no finished chorus.</p></div></article>
-          <article class="protocol-row"><span class="num">03</span><div><h3 data-en="The limiter is a tool, not a spiritual advisor." data-ru="Лимитер — инструмент, а не духовный наставник.">The limiter is a tool, not a spiritual advisor.</h3><p data-en="Turning it up until the waveform becomes a rectangle is not a mastering philosophy." data-ru="Поднимать его до тех пор, пока волна не станет прямоугольником, — это не философия мастеринга.">Turning it up until the waveform becomes a rectangle is not a mastering philosophy.</p></div></article>
-          <article class="protocol-row"><span class="num">04</span><div><h3 data-en="Save as: final_final_reallyfinal_21b.wav" data-ru="Сохранить как: final_final_точнофинал_21b.wav">Save as: final_final_reallyfinal_21b.wav</h3><p data-en="Version control is a state of mind. File names are the evidence." data-ru="Контроль версий — это состояние души. Имена файлов — улики.">Version control is a state of mind. File names are the evidence.</p></div></article>
-        </div><aside class="spec-panel"><div class="spec-title" data-en="Certified stone specifications" data-ru="Сертифицированные каменные характеристики">Certified stone specifications</div><div class="spec-line"><span>CORE</span><span>INFINITE MOAI</span></div><div class="spec-line"><span data-en="LOW END" data-ru="НИЗКИЕ ЧАСТОТЫ">LOW END</span><span>TECTONIC / 808</span></div><div class="spec-line"><span>DSP</span><span data-en="GEOLOGICAL PROCESSING" data-ru="ГЕОЛОГИЧЕСКАЯ ОБРАБОТКА">GEOLOGICAL PROCESSING</span></div><div class="spec-line"><span data-en="LATENCY" data-ru="ЗАДЕРЖКА">LATENCY</span><span>0 MS*</span></div><div class="spec-line"><span data-en="EMOTIONAL RANGE" data-ru="ЭМОЦИОНАЛЬНЫЙ ДИАПАЗОН">EMOTIONAL RANGE</span><span class="unlimited">FLATLINE</span></div><div class="spec-line"><span data-en="RENDER QUALITY" data-ru="КАЧЕСТВО РЕНДЕРА">RENDER QUALITY</span><span data-en="LEGENDARY" data-ru="ЛЕГЕНДАРНОЕ">LEGENDARY</span></div><p class="muted" style="font:8px var(--mono);line-height:1.65;margin:17px 0 0" data-en="*Spiritual latency may occur. These specifications are fictional, as is the audio engine." data-ru="*Возможна духовная задержка. Характеристики вымышлены, как и сам аудиодвижок.">*Spiritual latency may occur. These specifications are fictional, as is the audio engine.</p></aside></div>
-      </div>
-    </section>
-
-    <section class="section" id="updates">
-      <div class="wrap release-layout"><div class="release-heading"><div class="eyebrow" data-en="04 / Studio build notes" data-ru="04 / Заметки к сборкам">04 / Studio build notes</div><h2 class="section-title" data-en="Updates from <em>the quarry.</em>" data-ru="Обновления из <em>каменоломни.</em>">Updates from <em>the quarry.</em></h2><p data-en="The changelog is maintained by one developer and one statue that refuses to comment." data-ru="Журнал ведут один разработчик и одна статуя, которая отказывается от комментариев.">The changelog is maintained by one developer and one statue that refuses to comment.</p></div><div class="changelog">
-        <article class="change"><time data-en="v21.04 / NOW" data-ru="v21.04 / СЕЙЧАС">v21.04 / NOW</time><div><h3 data-en="The Sakura Patch" data-ru="Обновление сакуры">The Sakura Patch</h3><ul><li data-en="Added a red gate to an otherwise black-and-white reality." data-ru="В чёрно-белую реальность добавлены красные ворота.">Added a red gate to an otherwise black-and-white reality.</li><li data-en="Reclassified clipping as a landscape feature." data-ru="Клиппинг переквалифицирован в особенность ландшафта.">Reclassified clipping as a landscape feature.</li></ul></div></article>
-        <article class="change"><time>v21.03</time><div><h3 data-en="The Arrangement Incident" data-ru="Инцидент с аранжировкой">The Arrangement Incident</h3><ul><li data-en="Fixed the issue where bar 9 could theoretically exist." data-ru="Исправлена проблема, из-за которой теоретически мог существовать девятый такт.">Fixed the issue where bar 9 could theoretically exist.</li><li data-en="The fix introduced a second bar 8. This is now a feature." data-ru="Исправление добавило второй восьмой такт. Теперь это функция.">The fix introduced a second bar 8. This is now a feature.</li></ul></div></article>
-        <article class="change"><time>v21.02</time><div><h3 data-en="Money Has Entered the Timeline" data-ru="Деньги появились на таймлайне">Money Has Entered the Timeline</h3><ul><li data-en="Added a budget tab. It contains one empty cell and a stone icon." data-ru="Добавлена вкладка бюджета. В ней одна пустая ячейка и значок камня.">Added a budget tab. It contains one empty cell and a stone icon.</li><li data-en="Export now takes payment in attention." data-ru="Экспорт теперь принимает оплату вниманием.">Export now takes payment in attention.</li></ul></div></article>
-        <article class="change"><time>v21.01</time><div><h3 data-en="Initial Excavation" data-ru="Первая раскопка">Initial Excavation</h3><ul><li data-en="Launched with one loop, three plugins, and unreasonable certainty." data-ru="Запущено с одним лупом, тремя плагинами и необоснованной уверенностью.">Launched with one loop, three plugins, and unreasonable certainty.</li><li data-en="Known issue: the statue does not blink." data-ru="Известная проблема: статуя не моргает.">Known issue: the statue does not blink.</li></ul></div></article>
-      </div></div>
-    </section>
-
-    <section class="section mosaic-section" id="fragments">
-      <div class="wrap"><div class="mosaic-intro"><div><div class="eyebrow" data-en="05 / Loose files from the studio" data-ru="05 / Разрозненные файлы студии">05 / Loose files from the studio</div><h2 class="section-title" data-en="The wall of <em>evidence.</em>" data-ru="Стена <em>улик.</em>">The wall of <em>evidence.</em></h2></div><p class="section-intro" data-en="Eight image slots, no stock memes. Replace the checkerboard with your own screenshots, Moai art, and producer in-jokes." data-ru="Восемь мест под изображения, никаких случайных мемов из интернета. Замените шахматный фон своими скриншотами, изображениями моаи и приколами о продакшене.">Eight image slots, no stock memes. Replace the checkerboard with your own screenshots, Moai art, and producer in-jokes.</p></div>
-        <div class="mosaic-grid">
-          <figure class="image-tile item-1"><!-- IMAGE SLOT 09: replace assets/memes/09-main-project-meme.jpg with your main project meme. --><img src="assets/memes/09-main-project-meme.jpg" alt="Main MOAI Studio meme placeholder" data-alt-en="Main MOAI Studio meme placeholder" data-alt-ru="Заглушка главного мема MOAI Studio"><figcaption class="tile-caption"><b data-en="01 / The founding myth" data-ru="01 / Миф об основании">01 / The founding myth</b><span>MAIN / 01</span></figcaption></figure>
-          <figure class="image-tile item-2"><!-- IMAGE SLOT 10: replace assets/memes/10-eight-bar-loop.jpg with an 8-bar-loop joke. --><img src="assets/memes/10-eight-bar-loop.jpg" alt="Eight-bar loop meme placeholder" data-alt-en="Eight-bar loop meme placeholder" data-alt-ru="Заглушка мема о восьмитактовом лупе"><figcaption class="tile-caption"><b data-en="02 / Loop archaeology" data-ru="02 / Археология лупа">02 / Loop archaeology</b><span>LOOP / 02</span></figcaption></figure>
-          <figure class="image-tile item-3"><!-- IMAGE SLOT 11: replace assets/memes/11-bass-clipping.jpg with a bass or clipping meme. --><img src="assets/memes/11-bass-clipping.jpg" alt="Bass incident image placeholder" data-alt-en="Bass incident image placeholder" data-alt-ru="Заглушка мема о басе"><figcaption class="tile-caption"><b data-en="03 / Low-end incident" data-ru="03 / Инцидент на низах">03 / Low-end incident</b><span>808 / 03</span></figcaption></figure>
-          <figure class="image-tile item-4"><!-- IMAGE SLOT 12: replace assets/memes/12-comment-section.jpg with a comment screenshot you have permission to use. --><img src="assets/memes/12-comment-section.jpg" alt="Comment section meme placeholder" data-alt-en="Comment section meme placeholder" data-alt-ru="Заглушка мема из комментариев"><figcaption class="tile-caption"><b data-en="04 / Comment archaeology" data-ru="04 / Археология комментариев">04 / Comment archaeology</b><span>REPLIES / 04</span></figcaption></figure>
-          <figure class="image-tile item-5"><!-- IMAGE SLOT 13: replace assets/memes/13-final-export.jpg with a final-final export joke. --><img src="assets/memes/13-final-export.jpg" alt="Export limbo image placeholder" data-alt-en="Export limbo image placeholder" data-alt-ru="Заглушка мема о бесконечном экспорте"><figcaption class="tile-caption"><b data-en="05 / Export limbo" data-ru="05 / Лимб экспорта">05 / Export limbo</b><span>WAV / 05</span></figcaption></figure>
-          <figure class="image-tile item-6"><!-- IMAGE SLOT 14: replace assets/memes/14-moai-editorial.jpg with your favourite Moai sticker-style illustration. --><img src="assets/memes/14-moai-editorial.jpg" alt="Moai editorial image placeholder" data-alt-en="Moai editorial image placeholder" data-alt-ru="Заглушка редакционного изображения моаи"><figcaption class="tile-caption"><b data-en="06 / Stone-faced review" data-ru="06 / Рецензия с каменным лицом">06 / Stone-faced review</b><span>MOAI / 06</span></figcaption></figure>
-          <figure class="image-tile item-7"><!-- IMAGE SLOT 15: replace assets/memes/15-easter-egg.jpg with a secret visual clue. --><img src="assets/memes/15-easter-egg.jpg" alt="Hidden easter egg placeholder" data-alt-en="Hidden easter egg placeholder" data-alt-ru="Заглушка скрытой пасхалки"><figcaption class="tile-caption"><b data-en="07 / Do not tell the council" data-ru="07 / Не говорите совету">07 / Do not tell the council</b><span>SECRET / 07</span></figcaption></figure>
-          <figure class="image-tile item-8"><!-- IMAGE SLOT 16: replace assets/memes/16-community-canon.jpg with a future in-joke from your community. --><img src="assets/memes/16-community-canon.jpg" alt="Future community in-joke placeholder" data-alt-en="Future community in-joke placeholder" data-alt-ru="Заглушка будущего внутреннего мема"><figcaption class="tile-caption"><b data-en="08 / Community canon" data-ru="08 / Канон сообщества">08 / Community canon</b><span>CANON? / 08</span></figcaption></figure>
-        </div>
-      </div>
-    </section>
-
-    <section class="section discord-section" id="presence">
-      <div class="wrap discord-grid"><div class="discord-copy"><div class="eyebrow" data-en="06 / Presence without the pretence" data-ru="06 / Активность без притворства">06 / Presence without the pretence</div><h2 class="section-title" data-en="Currently carving <em>something.</em>" data-ru="Сейчас высекаем <em>что-то.</em>">Currently carving <em>something.</em></h2><p data-en="MOAI Studio 21 exists mainly as a playful concept for Discord Rich Presence. This page does not connect to Discord or set your status: an external RPC client would handle that part." data-ru="MOAI Studio 21 задуман прежде всего как шуточная концепция для Discord Rich Presence. Эта страница не подключается к Discord и не меняет статус: для этого потребуется отдельный RPC-клиент.">MOAI Studio 21 exists mainly as a playful concept for Discord Rich Presence. This page does not connect to Discord or set your status: an external RPC client would handle that part.</p><p data-en="Pick a status line and copy it into your own client. The stone has no API key, only conviction." data-ru="Выберите строку статуса и скопируйте её в свой клиент. У камня нет API-ключа — только убеждённость.">Pick a status line and copy it into your own client. The stone has no API key, only conviction.</p><div class="eyebrow" style="margin-top:26px" data-en="Status copy / ready to use" data-ru="Текст статуса / можно копировать">Status copy / ready to use</div></div>
-        <div class="presence-window"><div class="presence-top"><span data-en="MOAI PRESENCE CONFIG / LOCAL ONLY" data-ru="НАСТРОЙКА MOAI PRESENCE / ЛОКАЛЬНО">MOAI PRESENCE CONFIG / LOCAL ONLY</span><span class="presence-leds"><i></i><i></i><i></i></span></div><div class="presence-body"><div class="presence-icon"><!-- IMAGE SLOT 17: replace assets/memes/17-discord-icon.jpg with a square crop of your chosen Moai image. --><img src="assets/memes/17-discord-icon.jpg" alt="Discord activity icon placeholder" data-alt-en="Discord activity icon placeholder" data-alt-ru="Заглушка иконки активности Discord"></div><div class="presence-info"><div class="presence-title">MOAI Studio 21</div><div class="presence-line"><strong data-en="Playing" data-ru="Запускает">Playing</strong> / MOAI Studio</div><div class="presence-line" data-en="Carving a new drop" data-ru="Высекает новый дроп">Carving a new drop</div><div class="presence-line" data-en="JVR_Prod · BUILD 21.∞" data-ru="JVR_Prod · СБОРКА 21.∞">JVR_Prod · BUILD 21.∞</div></div></div><div class="presence-buttons"><button class="copy-status" type="button" data-copy="MOAI is cooking" data-en="COPY: MOAI IS COOKING" data-ru="КОПИРОВАТЬ: (MOAI is cooking) (на перевод v3)">COPY: MOAI IS COOKING</button><button class="copy-status" type="button" data-copy="Rendering ancient bass" data-en="COPY: ANCIENT BASS" data-ru="КОПИРОВАТЬ: ANCIENT BASS">COPY: ANCIENT BASS</button><button class="copy-status" type="button" data-copy="MOAI hapy)))" data-en="COPY: MOAI HAPY)))" data-ru="КОПИРОВАТЬ: (MOAI hapy))) (на перевод v2)">COPY: MOAI HAPY)))</button></div><div class="toast" id="copyToast" aria-live="polite"></div></div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <div class="wrap"><div class="footer-main"><div><div class="footer-brand">MOAI Studio <span>21</span></div><p class="footer-desc" data-en="Created by JVR_Prod. One developer. Zero human emotions. Infinite bass. A parody project inspired by music-production culture, internet humour, and a fictional civilization that takes the drop extremely seriously." data-ru="Создано JVR_Prod. Один разработчик. Ноль человеческих эмоций. Бесконечный бас. Пародийный проект, вдохновлённый культурой музыкального продакшена, интернет-юмором и вымышленной цивилизацией, которая относится к дропу предельно серьёзно.">Created by JVR_Prod. One developer. Zero human emotions. Infinite bass. A parody project inspired by music-production culture, internet humour, and a fictional civilization that takes the drop extremely seriously.</p></div><div class="credit-mark">CREATED BY<strong>JVR_Prod</strong><br><span data-en="ONE PERSON / MANY STONES" data-ru="ОДИН ЧЕЛОВЕК / МНОГО КАМНЕЙ">ONE PERSON / MANY STONES</span></div></div>
-      <div class="footer-bottom"><span>© <span id="year">2026</span> MOAI Studio 21 / JVR_Prod</span><div class="legal-links"><a href="https://javer-jvr.github.io/MOAI-Studio-Legal-by-JVR-Prod/terms.html" target="_blank" rel="noopener noreferrer" data-en="Terms of Service" data-ru="Условия использования">Terms of Service</a><a href="https://javer-jvr.github.io/MOAI-Studio-Legal-by-JVR-Prod/privacy.html" target="_blank" rel="noopener noreferrer" data-en="Privacy Policy" data-ru="Политика конфиденциальности">Privacy Policy</a><a href="#top" data-en="Back to top ↑" data-ru="Наверх ↑">Back to top ↑</a></div></div>
-      <p class="disclaimer" data-en="MOAI Studio 21 is an independent parody project. It is not affiliated with, endorsed by, or an official product of Image-Line, FL Studio, Discord, Exyl, Creo, Paper Skies, or any related company or artist. Artist names and track titles are not used as claims of partnership. All MOAI Studio universe quotes are original fictional writing. Replaceable image placeholders are provided for your own assets; check permissions before adding screenshots or other people’s artwork." data-ru="MOAI Studio 21 — независимый пародийный проект. Он не связан с Image-Line, FL Studio, Discord, Exyl, Creo, Paper Skies и соответствующими компаниями или артистами, не одобрен ими и не является их официальным продуктом. Имена артистов и названия треков не означают партнёрства. Все реплики вселенной MOAI Studio — оригинальные вымышленные тексты. На странице есть места для ваших изображений; перед добавлением скриншотов и чужих работ проверяйте права на их использование.">MOAI Studio 21 is an independent parody project. It is not affiliated with, endorsed by, or an official product of Image-Line, FL Studio, Discord, Exyl, Creo, Paper Skies, or any related company or artist. Artist names and track titles are not used as claims of partnership. All MOAI Studio universe quotes are original fictional writing. Replaceable image placeholders are provided for your own assets; check permissions before adding screenshots or other people’s artwork.</p>
-    </div>
-  </footer>
-  <script>
-    (function(){
-      'use strict';
-      var lang = 'en';
-      var langToggle = document.getElementById('langToggle');
-      var toast = document.getElementById('copyToast');
-      var toastTimer = 0;
-      var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      function storeGet(key){try{return localStorage.getItem(key);}catch(e){return null;}}
-      function storeSet(key,value){try{localStorage.setItem(key,value);}catch(e){/* storage is optional */}}
-      function setLanguage(next){
-        lang = next === 'ru' ? 'ru' : 'en';
-        document.documentElement.lang = lang;
-        document.querySelectorAll('[data-en][data-ru]').forEach(function(node){
-          var value = node.getAttribute('data-' + lang);
-          if(value !== null){ node.innerHTML = value; }
-        });
-        document.querySelectorAll('[data-alt-en][data-alt-ru]').forEach(function(node){node.alt = node.getAttribute('data-alt-' + lang);});
-        langToggle.setAttribute('aria-label', lang === 'en' ? 'Switch language to Russian' : 'Переключить язык на английский');
-        langToggle.setAttribute('aria-pressed', lang === 'ru' ? 'true' : 'false');
-        document.title = lang === 'en' ? 'MOAI Studio 21 — Stone Sound System' : 'MOAI Studio 21 — Каменная звуковая система';
-        updateDawLabels();
-        storeSet('moai-studio-language', lang);
-      }
-      langToggle.addEventListener('click', function(){setLanguage(lang === 'en' ? 'ru' : 'en');});
-      setLanguage(storeGet('moai-studio-language') === 'ru' ? 'ru' : 'en');
-
-      var daw = document.getElementById('fakeDaw');
-      var playBtn = document.getElementById('playBtn');
-      var bakeBtn = document.getElementById('bakeBtn');
-      var resetBtn = document.getElementById('resetBtn');
-      var dawClock = document.getElementById('dawClock');
-      var dawOutput = document.getElementById('dawOutput');
-      var engineState = document.getElementById('engineState');
-      var peakState = document.getElementById('peakState');
-      var meterFill = document.getElementById('meterFill');
-      var playing = false, baked = false;
-      function updateDawLabels(){
-        if(!playBtn) return;
-        playBtn.textContent = playing ? (lang==='en'?'Ⅱ PAUSE LOOP':'Ⅱ ПАУЗА ЛУПА') : (lang==='en'?'▶ PLAY LOOP':'▶ ЗАПУСТИТЬ ЛУП');
-        playBtn.setAttribute('aria-pressed', playing ? 'true' : 'false');
-        engineState.textContent = playing ? (lang==='en'?'RUNNING / ANCIENT':'РАБОТАЕТ / ДРЕВНИЙ') : (lang==='en'?'IDLE / ANCIENT':'ОЖИДАНИЕ / ДРЕВНИЙ');
-        peakState.textContent = baked ? (lang==='en'?'CLIPPED / BLESSED':'КЛИППИНГ / БЛАГОСЛОВЕН') : '+∞ DB (SPIRITUAL)';
-        dawClock.textContent = baked ? (lang==='en'?'DROP 01 / GEOLOGICAL EVENT':'ДРОП 01 / ГЕОЛОГИЧЕСКОЕ СОБЫТИЕ') : (lang==='en'?'BAR 009 / LOOP ∞':'ТАКТ 009 / ЛУП ∞');
-        dawOutput.innerHTML = baked ? (lang==='en'?'<strong>DROP STATUS:</strong> spiritually overcooked / confidence +∞':'<strong>СТАТУС ДРОПА:</strong> духовно пережарен / уверенность +∞') : (playing ? (lang==='en'?'<strong>PLAYBACK:</strong> ancestors approve. Still 8 bars.':'<strong>ВОСПРОИЗВЕДЕНИЕ:</strong> предки одобряют. Всё ещё 8 тактов.') : (lang==='en'?'<strong>MASTER BUS:</strong> spiritually peaking at +∞ dB':'<strong>МАСТЕР-ШИНА:</strong> духовный пик на +∞ dB'));
-        meterFill.style.width = baked ? '100%' : (playing ? '88%' : '72%');
-        bakeBtn.setAttribute('aria-pressed', baked ? 'true' : 'false');
-      }
-      updateDawLabels();
-      playBtn.addEventListener('click', function(){playing = !playing;updateDawLabels();});
-      bakeBtn.addEventListener('click', function(){baked = !baked;updateDawLabels();});
-      resetBtn.addEventListener('click', function(){playing = false;baked = false;updateDawLabels();});
-
-      document.querySelectorAll('[data-copy]').forEach(function(button){
-        button.addEventListener('click', function(){
-          var text = button.getAttribute('data-copy');
-          function show(ok){toast.textContent = ok ? (lang==='en'?'COPIED ✓':'СКОПИРОВАНО ✓') : (lang==='en'?'Copy was blocked; select the text manually.':'Копирование запрещено браузером; скопируйте текст вручную.');if(toastTimer){window.clearTimeout(toastTimer);}toastTimer=window.setTimeout(function(){toast.textContent='';},2800);}
-          if(navigator.clipboard && navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){show(true);}).catch(function(){show(fallbackCopy(text));});}else{show(fallbackCopy(text));}
-        });
-      });
-      function fallbackCopy(text){var area=document.createElement('textarea');area.value=text;area.setAttribute('readonly','');area.style.position='fixed';area.style.opacity='0';document.body.appendChild(area);area.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){ok=false;}area.remove();return ok;}
-
-      // Each image points to a uniquely named checkerboard JPG in assets/memes/. Replace the corresponding JPG with your own image, keeping its filename, or change its src to a different relative path.
-      document.querySelectorAll('img').forEach(function(img){img.addEventListener('error',function(){img.style.backgroundColor='#f4f1eb';img.style.backgroundImage='linear-gradient(45deg,#111 25%,transparent 25%),linear-gradient(-45deg,#111 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#111 75%),linear-gradient(-45deg,transparent 75%,#111 75%)';img.style.backgroundSize='24px 24px';img.style.backgroundPosition='0 0,0 12px,12px -12px,-12px 0';img.removeAttribute('src');},{once:true});});
-
-      // Gentle scroll parallax; disabled when reduced motion is requested.
-      var parallaxItems = Array.prototype.slice.call(document.querySelectorAll('[data-parallax]'));
-      var ticking = false;
-      function updateParallax(){
-        ticking = false;
-        if(reducedMotion) return;
-        var scroll = window.scrollY || window.pageYOffset || 0;
-        parallaxItems.forEach(function(el){var speed=parseFloat(el.getAttribute('data-parallax'))||0;el.style.setProperty('--parallax-y',(scroll*speed).toFixed(2)+'px');});
-      }
-      if(!reducedMotion && parallaxItems.length){window.addEventListener('scroll',function(){if(!ticking){window.requestAnimationFrame(updateParallax);ticking=true;}},{passive:true});updateParallax();}
-      document.getElementById('year').textContent = String(new Date().getFullYear());
-    })();
-  </script>
+<script>
+/* ===== SHOP DATA — edit here. To swap a product: change `url` (any YouTube link) and the texts. Images: assets/shop/pN.jpg ===== */
+const SHOP=[
+{img:"assets/shop/p1.jpg",cls:"xl",price:"¥21 000",url:"https://www.youtube.com/watch?v=MpYT72zTLn8",
+ en:{n:"Ronin Drop Kit: “Honor Before BPM”",d:"88 presets for people who treat the drop as a matter of honour. Includes one very formal riser."},
+ ru:{n:"Ронин-дроп-кит «Честь важнее BPM»",d:"88 пресетов для тех, кто считает дроп делом чести. В комплекте один очень официальный райзер."}},
+{img:"assets/shop/p2.jpg",cls:"m",price:"1 000 000 000 ₥",url:"https://www.youtube.com/watch?v=kpGdeUE26Dk",
+ en:{n:"Banknote No. 0001, inflation-resistant",d:"Collectible. Its value drops slower than the others, which is not a compliment."},
+ ru:{n:"Банкнота № 0001, устойчивая к инфляции",d:"Коллекционная. Падает в цене медленнее остальных, что не комплимент."}},
+{img:"assets/shop/p3.jpg",cls:"s",price:"$19.99 (tax paid in 1550)",url:"https://www.youtube.com/watch?v=6DpNIql7uPk",
+ en:{n:"Ancient Bass Expansion v1.0",d:"Fills the room, not the folder. Zero files inside."},
+ ru:{n:"Древнее расширение баса v1.0",d:"Заполняет комнату, а не папку. Внутри ноль файлов."}},
+{img:"assets/shop/p4.jpg",cls:"w",price:"€0.00 + 1 apology",url:"https://www.youtube.com/watch?v=114rxHa0qzo",
+ en:{n:"Cameo Pack: The Last 8 Seconds",d:"Samples recorded only at the very end, when you have stopped paying attention."},
+ ru:{n:"Камео-пак «Последние 8 секунд»",d:"Сэмплы записаны строго в самом конце, когда вы уже перестали следить."}},
+{img:"assets/shop/p5.jpg",cls:"m",price:"€24",url:"https://www.youtube.com/watch?v=8CYy9jNmpXM",
+ en:{n:"Frame Print Vol. 1: “Looks Expensive”",d:"Square print of a shot you will pause three times."},
+ ru:{n:"Принт «Кадр» Vol. 1: «Выглядит дорого»",d:"Квадратный принт кадра, на котором вы поставите паузу трижды."}},
+{img:"assets/shop/p6.jpg",cls:"xl",price:"£14.40",url:"https://www.youtube.com/watch?v=_LUFMHvvNt4",
+ en:{n:"Cellar Reverb IR: Reserve",d:"Impulse response of a very large room and a very small glass. Vintage: undetermined."},
+ ru:{n:"Импульс «Погреб»: резерв",d:"Импульсная характеристика очень большого помещения и очень маленького бокала. Год урожая не установлен."}}
+];
+const VOICES=[
+{c:"r",en:{w:"Gennady, rotation worker",q:"Music stopped paying my bills back when Napoleon was around, so I took a rotation job and write beats on the shift bus. The snare is the door."},ru:{w:"Геннадий, вахтовик",q:"Музыка перестала меня кормить ещё при Наполеоне, поэтому я пошёл на вахту и пишу биты в вахтовом автобусе. Снейр — это дверь."}},
+{en:{w:"Bartholomew, unfinished album",q:"The album is 90% done. I said that in 1722 when the Dutch showed up, and it was 90% then too."},ru:{w:"Варфоломей, альбом не закончен",q:"Альбом готов на 90%. Я так сказал в 1722-м, когда приплыли голландцы, и тогда было ровно 90%."}},
+{en:{w:"Oleg, monetizes everything",q:"I put the kick drum on subscription. Fourteen subscribers. Thirteen are cousins from the same quarry."},ru:{w:"Олег, монетизирует всё",q:"Я пустил бочку по подписке. Четырнадцать подписчиков. Тринадцать — двоюродные из того же карьера."}},
+{c:"r",en:{w:"Kenji, samurai",q:"I missed the release by two days. I now mix kneeling until the label forgives me. The label does not know."},ru:{w:"Кэндзи, самурай",q:"Я опоздал с релизом на два дня. Теперь свожу на коленях, пока лейбл не простит. Лейбл не в курсе."}},
+{en:{w:"Zina, studio admin",q:"Please stop uploading files named FINAL_REAL_2. The server is also a rock, and it remembers."},ru:{w:"Зина, администратор студии",q:"Перестаньте заливать файлы FINAL_REAL_2. Сервер тоже камень, и он всё помнит."}},
+{en:{w:"Arkady, 98 years in the business",q:"In '98 an A&R promised to call. I still face the sea in case he does."},ru:{w:"Аркадий, в индустрии с 98-го",q:"В 98-м один A&R обещал перезвонить. Я до сих пор стою лицом к морю, вдруг позвонит."}},
+{en:{w:"Pasha, producer",q:"The master is perfect. I checked on three speakers. Two were a fridge."},ru:{w:"Паша, продюсер",q:"Мастер идеальный. Проверил на трёх колонках. Две оказались холодильником."}},
+{c:"r",en:{w:"Flute, no surname",q:"Do not call it a gimmick. My grandfather was a flute. A flute, not a person."},ru:{w:"Флейта, без фамилии",q:"Не называйте это приколом. Мой дед был флейтой. Флейтой, не человеком."}}
+];
+let L=(()=>{try{return localStorage.getItem("moai-lang")}catch(e){}})()||"en";
+function render(){
+ document.documentElement.lang=L;
+ document.querySelectorAll("[data-en]").forEach(e=>e.innerHTML=e.dataset[L]);
+ const ext=L==="ru"?"Видео Exyl на YouTube ↗":"Exyl video on YouTube ↗";
+ document.getElementById("shelfGrid").innerHTML=SHOP.map((p,i)=>{const t=p[L];
+  return `<a class="item ${p.cls}" href="${p.url}" target="_blank" rel="noopener noreferrer" aria-label="${t.n}. ${ext}">
+  <span class="tag">${p.price}</span><div class="ph"><img src="${p.img}" alt="" onerror="this.remove()"></div>
+  <div class="cap"><h3>${t.n}</h3><p>${t.d}</p><span class="ext">${ext}</span></div></a>`}).join("");
+ document.getElementById("voiceGrid").innerHTML=VOICES.map((v,i)=>{const t=v[L];
+  return `<figure class="v ${v.c||""}" style="margin:0"><blockquote style="margin:0"><q>${t.q}</q></blockquote>
+  <cite><span class="ph"><img src="assets/memes/voice-${i+1}.jpg" alt="" onerror="this.remove()"></span><span><b>${t.w}</b></span></cite></figure>`}).join("");
+}
+document.getElementById("lang").onclick=()=>{L=L==="en"?"ru":"en";try{localStorage.setItem("moai-lang",L)}catch(e){}render()};
+render();
+const rm=matchMedia("(prefers-reduced-motion:reduce)").matches;
+if(!rm){const ps=[...document.querySelectorAll(".par")];addEventListener("scroll",()=>{const y=scrollY;ps.forEach(e=>e.style.transform=`translateY(${y*e.dataset.p}px)`)},{passive:true})}
+</script>
 </body>
 </html>
